@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import Helmet from 'react-helmet';
+import RaisedButton from 'material-ui/RaisedButton';
 
 export default class Home extends Component {
   render() {
@@ -7,7 +8,7 @@ export default class Home extends Component {
     return (
       <div>
         <Helmet title="Home"/>
-        HEOMM!!
+        <RaisedButton label="Secondary" secondary={true}  />
       </div>
     );
   }

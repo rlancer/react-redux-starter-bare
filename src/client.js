@@ -8,10 +8,11 @@ import createStore from './redux/create';
 import ApiClient from './helpers/ApiClient';
 import io from 'socket.io-client';
 import {Provider} from 'react-redux';
-import { Router, browserHistory } from 'react-router';
-import { syncHistoryWithStore } from 'react-router-redux';
-import { ReduxAsyncConnect } from 'redux-connect';
+import {Router, browserHistory} from 'react-router';
+import {syncHistoryWithStore} from 'react-router-redux';
+import {ReduxAsyncConnect} from 'redux-connect';
 import useScroll from 'scroll-behavior/lib/useStandardScroll';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 
 import getRoutes from './routes';
 
@@ -25,7 +26,7 @@ function initSocket() {
   const socket = io('', {path: '/ws'});
   socket.on('news', (data) => {
     console.log(data);
-    socket.emit('my other event', { my: 'data from client' });
+    socket.emit('my other event', {my: 'data from client'});
   });
   socket.on('msg', (data) => {
     console.log(data);
@@ -46,7 +47,9 @@ const component = (
 
 ReactDOM.render(
   <Provider store={store} key="provider">
-    {component}
+    <MuiThemeProvider >
+      {component}
+    </MuiThemeProvider>
   </Provider>,
   dest
 );
