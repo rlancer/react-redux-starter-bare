@@ -12,6 +12,7 @@ import Html from './helpers/Html';
 import PrettyError from 'pretty-error';
 import http from 'http';
 
+
 import {match} from 'react-router';
 import {syncHistoryWithStore} from 'react-router-redux';
 import {ReduxAsyncConnect, loadOnServer} from 'redux-connect';
@@ -19,6 +20,9 @@ import createHistory from 'react-router/lib/createMemoryHistory';
 import {Provider} from 'react-redux';
 import getRoutes from './routes';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Logic from './redux/Logic';
+
+
 
 const targetUrl = 'http://' + config.apiHost + ':' + config.apiPort;
 const pretty = new PrettyError();
@@ -41,6 +45,15 @@ app.use((req, res) => {
   const store = createStore(memoryHistory, client);
   const history = syncHistoryWithStore(memoryHistory, store);
 
+  const logic = new Logic({store});
+
+  const MyProvider = Provider;
+  MyProvider.prototype.getChildContext = function getChildContext() {
+    return {store, logic};
+  };
+
+  Object.assign(MyProvider.childContextTypes, {logic: React.PropTypes.object});
+
   function hydrateOnClient() {
     res.send('<!doctype html>\n' +
       ReactDOM.renderToString(<Html assets={webpackIsomorphicTools.assets()} store={store}/>));
@@ -61,11 +74,11 @@ app.use((req, res) => {
     } else if (renderProps) {
       loadOnServer({...renderProps, store, helpers: {client}}).then(() => {
         const component = (
-          <Provider store={store} key="provider">
+          <MyProvider store={store} key="provider">
             <MuiThemeProvider >
               <ReduxAsyncConnect {...renderProps} />
             </MuiThemeProvider>
-          </Provider>
+          </MyProvider>
         );
 
         res.status(200);

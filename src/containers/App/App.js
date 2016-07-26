@@ -4,14 +4,12 @@ import config from '../../config';
 
 export default class App extends Component {
   static propTypes = {
-    children: PropTypes.object.isRequired,
-    user: PropTypes.object,
-    logout: PropTypes.func.isRequired,
-    pushState: PropTypes.func.isRequired
+    children: PropTypes.object.isRequired
   };
 
   static contextTypes = {
-    store: PropTypes.object.isRequired
+    store: PropTypes.object.isRequired,
+    logic: PropTypes.object.isRequired,
   };
 
   render() {

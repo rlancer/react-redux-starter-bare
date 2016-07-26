@@ -6,13 +6,14 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import createStore from './redux/create';
 import ApiClient from './helpers/ApiClient';
-import io from 'socket.io-client';
 import {Provider} from 'react-redux';
 import {Router, browserHistory} from 'react-router';
 import {syncHistoryWithStore} from 'react-router-redux';
 import {ReduxAsyncConnect} from 'redux-connect';
 import useScroll from 'scroll-behavior/lib/useStandardScroll';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Logic from './redux/Logic';
+import injectTapEventPlugin from 'react-tap-event-plugin';
 
 import getRoutes from './routes';
 
@@ -22,20 +23,15 @@ const dest = document.getElementById('content');
 const store = createStore(_browserHistory, client, window.__data);
 const history = syncHistoryWithStore(_browserHistory, store);
 
-function initSocket() {
-  const socket = io('', {path: '/ws'});
-  socket.on('news', (data) => {
-    console.log(data);
-    socket.emit('my other event', {my: 'data from client'});
-  });
-  socket.on('msg', (data) => {
-    console.log(data);
-  });
+const logic = new Logic({store});
+injectTapEventPlugin();
 
-  return socket;
-}
+const MyProvider = Provider;
+MyProvider.prototype.getChildContext = function getChildContext() {
+  return {store, logic};
+};
 
-global.socket = initSocket();
+Object.assign(MyProvider.childContextTypes, {logic: React.PropTypes.object});
 
 const component = (
   <Router render={(props) =>
@@ -46,11 +42,11 @@ const component = (
 );
 
 ReactDOM.render(
-  <Provider store={store} key="provider">
+  <MyProvider store={store} key="provider">
     <MuiThemeProvider >
       {component}
     </MuiThemeProvider>
-  </Provider>,
+  </MyProvider>,
   dest
 );
 
